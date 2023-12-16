@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@tailwind variants;
+
+html,
+body {
+	@apply h-full overflow-hidden;
+}
+
+/* vintage theme */
+@font-face {
+	font-family: 'Abril Fatface';
+	src: url('/fonts/AbrilFatface.ttf');
+	font-display: swap;
+}
+
+.avatar-image {
+	@apply border-2 border-red-500;
+}
+
+[data-fs-input] {
+	@apply input;
+}
+
+[data-fs-select] {
+	@apply input;
+}
+
+input {
+	color-scheme: dark;
+}

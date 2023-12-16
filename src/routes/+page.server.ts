@@ -6,8 +6,9 @@ import type { Actions, PageServerLoad } from './$types';
 import { bottleSchema, type BottleFormSchema } from './EditBottle.svelte';
 
 export const load: PageServerLoad = async () => {
+	const debug = true;
 	const form = await superValidate(bottleSchema);
-	return { form };
+	return { form, bottles, debug };
 };
 
 function maxId(tmpBottles: TBottles): number {

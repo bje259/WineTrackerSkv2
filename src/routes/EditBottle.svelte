@@ -1,6 +1,7 @@
 <script lang="ts" context="module">
 	import { cn } from '$lib/utils';
 	import { getYear } from 'date-fns';
+	import SuperDebug from 'sveltekit-superforms/client/SuperDebug.svelte';
 	import { z } from 'zod';
 
 	export const bottleSchema = z.object({
@@ -74,6 +75,8 @@
 		document.getElementById(triggerId)?.focus();
 	});
 } */
+
+	$: bottles = $page.data.bottles;
 </script>
 
 <div class="flex items-center justify-between">
@@ -207,3 +210,11 @@
 		</form>
 	</Form.Root>
 </div>
+<div class="flex text-start">
+	{#if $page.data.debug}<SuperDebug data={theForm.form} collapsible />{/if}
+</div>
+
+{#each bottles as bottle}
+	<br />
+	<p>{JSON.stringify(bottle, null, 2)}</p>
+{/each}

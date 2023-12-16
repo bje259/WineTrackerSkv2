@@ -12,7 +12,7 @@
 
 <div class="container h-full mx-auto flex justify-center">
 	<div class="px-4 text-center flex flex-col items-center">
-		<h1 class="h1">Form Testing!</h1>
+		<h1 class="h1">Wine Tracker!</h1>
 		<!-- <TestForm {data} /> -->
 		<EditBottle form={data.form} />
 	</div>

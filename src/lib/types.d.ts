@@ -149,7 +149,7 @@ export interface SearchParams {
 }
 
 export interface Bottle {
-	Id: number;
+	Id: string;
 	Producer: string;
 	Name: string;
 	Varietal: string;
@@ -165,7 +165,7 @@ export interface Bottle {
 /**
  * @description Test Bottle interface
  * @interface TBottle
- * @property {number} Id - The id of the bottle.
+ * @property {string} Id - The id of the bottle.
  * @property {string} Producer - The name of the producer.
  * @property {string} Name - The name of the wine.
  * @property {number} Vintage - The vintage of the wine.
@@ -175,7 +175,7 @@ export interface Bottle {
  * @see Bottles
  */
 export interface TBottle {
-	Id: number;
+	Id: string;
 	Producer: string;
 	Name: string;
 	Vintage: number;
@@ -186,7 +186,6 @@ export interface TBottle {
 export type TBottles = TBottle[];
 
 export type Bottles = Bottle[];
-
 
 export interface ShowBottleFields {
 	Producer: boolean;

@@ -22,6 +22,7 @@ const config = {
 			$lib: './src/lib',
 			$routes: './src/routes'
 		}
-	}
+	},
+	compilerOptions: {}
 };
 export default config;

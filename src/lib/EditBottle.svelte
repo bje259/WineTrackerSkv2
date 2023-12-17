@@ -1,13 +1,14 @@
 <script lang="ts">
-	/* eslint-disable @typescript-eslint/no-unused-vars */
 	import { page } from '$app/stores';
 	import * as Form from '$components/ui/form/';
 	import * as Popover from '$components/ui/popover';
+	import { bottleSchema } from '$lib/BottlesDB';
+	import FormSelectYear from '$lib/FormSelectYear.svelte';
 	import { buttonVariants } from '$lib/components/ui/button/';
 	import { Calendar } from '$lib/components/ui/calendar/';
+	import { cn } from '$lib/utils';
 	import {
 		CalendarDate,
-		DateFormatter,
 		getLocalTimeZone,
 		parseDate,
 		today,
@@ -16,63 +17,51 @@
 	import { CalendarIcon } from 'lucide-svelte';
 	import type { SuperValidated } from 'sveltekit-superforms';
 	import { superForm } from 'sveltekit-superforms/client';
-	import { bottleSchema } from './BottlesDB';
-	import writable from 'svelte/store';
-	import type {Writable}  from 'svelte/store';
-	import { z } from 'zod';
-
+	import SuperDebug from 'sveltekit-superforms/client/SuperDebug.svelte';
 	const crudSchema = bottleSchema.extend({
-	Id: bottleSchema.shape.Id.optional()
-});
+		Id: bottleSchema.shape.Id.optional()
+	});
 	type CrudSchema = typeof crudSchema;
+	// Formatter for "MM/DD/YYYY"
+	const df = new Intl.DateTimeFormat('en-US', {
+		year: 'numeric',
+		month: '2-digit',
+		day: '2-digit'
+	});
 
 	export let data: SuperValidated<CrudSchema>;
 
-	
-
-	const df = new DateFormatter('en-US', {
-		dateStyle: 'long'
-	});
-
-	let open = false;
-
-	const {form: theForm} = superForm(data, {
+	const formData = superForm(data, {
 		validators: crudSchema,
-		taintedMessage: null
+		taintedMessage: null,
+		resetForm: true
 	});
 
-	$: formStore = theForm;
-	let value1: DateValue | undefined = $formStore.Purchased
-		? parseDate($formStore.Purchased)
+	$: ({ form: theForm, delayed } = formData);
+
+	let value1: DateValue | undefined = $theForm.Purchased
+		? parseDate($theForm.Purchased)
 		: undefined;
-	let value2: DateValue | undefined = $formStore.Consumed
-		? parseDate($formStore.Consumed)
-		: undefined;
+	let value2: DateValue | undefined = $theForm.Consumed ? parseDate($theForm.Consumed) : undefined;
+
 	let placeholder: DateValue = today(getLocalTimeZone());
-
-	/* function closeAndFocusTrigger(triggerId: string) {
-	open = false;
-	tick().then(() => {
-		document.getElementById(triggerId)?.focus();
-	});
-} */
-
 </script>
 
 <div class="flex items-center justify-between">
 	<Form.Root
-		Form={theForm}
-		schema={bottleSchema}
+		form={formData}
+		controlled={true}
+		schema={crudSchema}
 		class="space-y-2"
 		let:config
 		debug={true}
 		let:enhance
 		asChild
-		controlled
-		action="?/newBottle"
 	>
-		<form method="POST" action="?/newBottle" use:enhance>
-			<Form.Field {config} name="wineName">
+		<form method="POST" use:enhance>
+			<input type="hidden" name="Id" bind:value={$theForm.Id} />
+
+			<Form.Field {config} name="Name">
 				<div class="flex">
 					<Form.Label class="p-0.5">Wine Name</Form.Label>
 					<Form.Validation class="ml-8" />
@@ -80,7 +69,7 @@
 				<Form.Input />
 				<Form.Description>The name of this wine bottle.</Form.Description>
 			</Form.Field>
-			<Form.Field {config} name="producer">
+			<Form.Field {config} name="Producer">
 				<div class="flex">
 					<Form.Label class="p-0.5">Producer</Form.Label>
 					<Form.Validation class="ml-8" />
@@ -89,28 +78,15 @@
 
 				<Form.Description>The producer of this wine bottle.</Form.Description>
 			</Form.Field>
-			<Form.Field {config} name="vintage">
+			<Form.Field {config} name="Vintage">
 				<div class="flex">
 					<Form.Label class="p-0.5">Vintage</Form.Label>
 					<Form.Validation class="ml-8" />
 				</div>
-				<Form.Select>
-					<Form.SelectTrigger placeholder="2022" />
-					<Form.SelectContent>
-						{#each { length: 20 } as _, i}
-							<Form.SelectItem
-								value={new Date().getFullYear() - 20 + i}
-								label={`${new Date().getFullYear() - 20 + i}`}
-							>
-								{new Date().getFullYear() - 20 + i}
-							</Form.SelectItem>
-						{/each}
-					</Form.SelectContent>
-				</Form.Select>
-
+				<FormSelectYear />
 				<Form.Description>The vintage of this wine bottle.</Form.Description>
 			</Form.Field>
-			<Form.Field {config} name="purchased">
+			<Form.Field {config} name="Purchased">
 				<Form.Label>Purchased Date</Form.Label>
 				<Popover.Root>
 					<Form.Control id="purchased" let:attrs>
@@ -137,9 +113,9 @@
 							initialFocus
 							onValueChange={(v) => {
 								if (v) {
-									$formStore.purchased = v.toString();
+									$theForm.Purchased = df.format(v.toDate(getLocalTimeZone())).toString();
 								} else {
-									$formStore.purchased = '01/01/1900';
+									$theForm.Purchased = '01/01/1900';
 								}
 							}}
 						/>
@@ -148,7 +124,7 @@
 				<Form.Description>The date this wine bottle was purchased.</Form.Description>
 				<Form.Validation />
 			</Form.Field>
-			<Form.Field {config} name="consumed">
+			<Form.Field {config} name="Consumed">
 				<Form.Label>Consumed Date</Form.Label>
 				<Popover.Root>
 					<Form.Control id="consumed" let:attrs>
@@ -175,9 +151,9 @@
 							initialFocus
 							onValueChange={(v) => {
 								if (v) {
-									$formStore.consumed = v.toString();
+									$theForm.Consumed = df.format(v.toDate(getLocalTimeZone())).toString();
 								} else {
-									$formStore.consumed = '01/01/1900';
+									$theForm.Consumed = '01/01/1900';
 								}
 							}}
 						/>
@@ -187,14 +163,10 @@
 				<Form.Validation />
 			</Form.Field>
 			<Form.Button class="variant-filled-surface btn">Submit</Form.Button>
+			{#if $delayed}Working...{/if}
 		</form>
 	</Form.Root>
 </div>
 <div class="flex text-start">
-	{#if $page.data.debug}<SuperDebug data={theForm.form} collapsible />{/if}
+	{#if $page.data.debug}<SuperDebug data={$theForm} collapsible />{/if}
 </div>
-
-{#each bottles as bottle}
-	<br />
-	<p>{JSON.stringify(bottle, null, 2)}</p>
-{/each}

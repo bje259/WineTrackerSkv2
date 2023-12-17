@@ -21,11 +21,13 @@ export const bottleSchema = z.object({
 	Purchased: z
 		.string()
 		.refine((v) => v)
-		.optional(),
+		.optional()
+		.default('01/01/1900'),
 	Consumed: z
 		.string()
 		.refine((v) => v)
 		.optional()
+		.default('01/01/1900')
 });
 
 export type BottleDB = z.infer<typeof bottleSchema>[];
@@ -35,10 +37,10 @@ export const bottleId = () => String(Math.random()).slice(2);
 
 // A simple user "database"
 
-function maxId(tmpBottles: TBottles): number {
-	const maxId = tmpBottles.reduce((max, bottle) => Math.max(max, bottle.Id), 0);
-	return maxId;
-}
+// function maxId(tmpBottles: TBottles): number {
+// 	const maxId = tmpBottles.reduce((max, bottle) => Math.max(max, bottle.Id), 0);
+// 	return maxId;
+// }
 
 export const bottles: BottleDB = [
 	{

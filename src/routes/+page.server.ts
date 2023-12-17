@@ -3,7 +3,7 @@ import { fail } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms/server';
 import type z from 'zod';
 import type { Actions, PageServerLoad } from './$types';
-import { bottleSchema, type BottleFormSchema } from './EditBottle.svelte';
+import { bottleSchema, type BottleFormSchema } from '../lib/EditBottle.svelte';
 
 export const load: PageServerLoad = async () => {
 	const debug = true;
@@ -11,18 +11,15 @@ export const load: PageServerLoad = async () => {
 	return { form, bottles, debug };
 };
 
-function maxId(tmpBottles: TBottles): number {
-	const maxId = tmpBottles.reduce((max, bottle) => Math.max(max, bottle.Id), 0);
-	return maxId;
-}
 
-function resetForm(data: z.infer<BottleFormSchema>): void {
-	data.wineName = '';
-	data.vintage = 2020;
-	data.producer = '';
-	data.purchased = '01/01/1900';
-	data.consumed = '01/01/1900';
-}
+
+// function resetForm(data: z.infer<BottleFormSchema>): void {
+// 	data.wineName = '';
+// 	data.vintage = 2020;
+// 	data.producer = '';
+// 	data.purchased = '01/01/1900';
+// 	data.consumed = '01/01/1900';
+// }
 
 let bottles: TBottles = [
 	{

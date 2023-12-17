@@ -1,36 +1,5 @@
-<script lang="ts" context="module">
-	import { cn } from '$lib/utils';
-	import { getYear } from 'date-fns';
-	import SuperDebug from 'sveltekit-superforms/client/SuperDebug.svelte';
-	import { z } from 'zod';
-
-	export const bottleSchema = z.object({
-		wineName: z
-			.string()
-			.min(1, { message: 'Name cannot be empty' })
-			.max(30, { message: 'Name cannot be longer than 30 characters' }),
-		producer: z
-			.string()
-			.min(1, { message: 'Producer cannot be empty' })
-			.max(30, { message: 'Producer cannot be longer than 30 characters' }),
-		vintage: z
-			.number()
-			.min(1900, { message: 'Vintage must be after 1900' })
-			.max(getYear(new Date()), { message: 'Vintage must be before the current year' })
-			.default(2022),
-		purchased: z
-			.string()
-			.refine((v) => v)
-			.optional(),
-		consumed: z
-			.string()
-			.refine((v) => v)
-			.optional()
-	});
-	export type BottleFormSchema = typeof bottleSchema;
-</script>
-
 <script lang="ts">
+	/* eslint-disable @typescript-eslint/no-unused-vars */
 	import { page } from '$app/stores';
 	import * as Form from '$components/ui/form/';
 	import * as Popover from '$components/ui/popover';
@@ -47,25 +16,37 @@
 	import { CalendarIcon } from 'lucide-svelte';
 	import type { SuperValidated } from 'sveltekit-superforms';
 	import { superForm } from 'sveltekit-superforms/client';
+	import { bottleSchema } from './BottlesDB';
+	import writable from 'svelte/store';
+	import type {Writable}  from 'svelte/store';
+	import { z } from 'zod';
 
-	export let form: SuperValidated<BottleFormSchema> = $page.data.bottleForm;
+	const crudSchema = bottleSchema.extend({
+	Id: bottleSchema.shape.Id.optional()
+});
+	type CrudSchema = typeof crudSchema;
+
+	export let data: SuperValidated<CrudSchema>;
+
+	
+
 	const df = new DateFormatter('en-US', {
 		dateStyle: 'long'
 	});
 
 	let open = false;
 
-	const theForm = superForm(form, {
-		validators: bottleSchema,
+	const {form: theForm} = superForm(data, {
+		validators: crudSchema,
 		taintedMessage: null
 	});
 
-	const { form: formStore } = theForm;
-	let value1: DateValue | undefined = $formStore.purchased
-		? parseDate($formStore.purchased)
+	$: formStore = theForm;
+	let value1: DateValue | undefined = $formStore.Purchased
+		? parseDate($formStore.Purchased)
 		: undefined;
-	let value2: DateValue | undefined = $formStore.consumed
-		? parseDate($formStore.consumed)
+	let value2: DateValue | undefined = $formStore.Consumed
+		? parseDate($formStore.Consumed)
 		: undefined;
 	let placeholder: DateValue = today(getLocalTimeZone());
 
@@ -76,12 +57,11 @@
 	});
 } */
 
-	$: bottles = $page.data.bottles;
 </script>
 
 <div class="flex items-center justify-between">
 	<Form.Root
-		form={theForm}
+		Form={theForm}
 		schema={bottleSchema}
 		class="space-y-2"
 		let:config
